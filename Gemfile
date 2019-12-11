@@ -3,6 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.4'
 
+gem 'ogp', "~> 0.3.0"
 gem "rspec-rails", "~> 3.9"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
