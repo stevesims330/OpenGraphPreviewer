@@ -9,12 +9,13 @@ class FetchUrlWorker
     rescue Faraday::ConnectionFailed
       result[:status] = 400
       result[:error] = "Could not load #{document_url}. Perhaps the site is down or the URL is mistyped."
-    rescue OGP::MalformedSourceError => e
-      result[:status] = 400
-      result[:error] = "No Open Graph og:image attribute found."
     end
 
-    #TODO(stevesims330): Write a Redis config file
+    unless result[:url]
+      result[:error] = "Not a valid Open Graph document." # In theory, it could have an og:image attribute but not some of the other mandatory attributes.
+      result[:status] = 400
+    end
+
     Redis.new.set(request_id, result)
     result
   end

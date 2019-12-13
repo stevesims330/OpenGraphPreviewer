@@ -18,9 +18,18 @@ RSpec.describe ImageParsingService, type: :service do
       expect(service.height).to be_nil
     end
 
-    it "throws a MissingAttributeError if the image URL attribute is absent" do
+    it "returns nil attributes if the required image URL attribute is absent" do
       content = File.read("#{File.dirname(__FILE__)}/../fixtures/image_structured_attributes_no_image.html")
-      expect { ImageParsingService.new(content) }.to raise_error(OGP::MissingAttributeError)
+      service = ImageParsingService.new(content)
+
+      expect(service.url).to be_nil
+      expect(service.width).to be_nil
+      expect(service.height).to be_nil
+    end
+
+    it "raises an InvalidHtmlException if the document is missing an </html> closing tag" do
+      content = File.read("#{File.dirname(__FILE__)}/../fixtures/invalid_webpage.html")
+      expect { ImageParsingService.new(content) }.to raise_exception(InvalidHtmlException)
     end
   end
 end
