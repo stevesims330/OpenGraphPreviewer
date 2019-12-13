@@ -1,4 +1,4 @@
-class Api::V1::OpenGraphParserController < ApplicationController
+class Api::V1::ImageParserController < ApplicationController
 
   #TODO(stevesims330): Make it so this doesn't block the thread by kicking it off into a job.
 
@@ -11,7 +11,7 @@ class Api::V1::OpenGraphParserController < ApplicationController
     end
 
     begin
-      image_url = OpenGraphImageParsingService.new(response.body).url
+      image_url = ImageParsingService.new(response.body).url
     rescue OGP::MalformedSourceError => e
       return render status: :bad_request, json: "No Open Graph og:image attribute found."
     end
