@@ -12,7 +12,7 @@ bundle install
 # Startup
 In one tab:
 `brew services start redis`
-`redis-server`
+`bundle exec redis-server`
 
 In a second tab:
 `bundle exec sidekiq`
