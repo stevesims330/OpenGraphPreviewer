@@ -1,7 +1,4 @@
 /*
- * I thought about using a styles.jsx file, but I started the frontend on the weekend and the assignment explicitly requires
- * the usage of a CSS file. Also, if this were a larger app, this would let me share styling with non-React components.
- *
  *= require_tree .
  *= require_self
  */
@@ -29,9 +26,7 @@ body {
 }
 
 /*
- * This makes sure images aren't wider than the URL bar while preserving their aspect ratio. You can test this by
- * running bin/webpack --watch --colors --progress, commenting this out, reloading the page, and visiting
- * https://revelry.co/vs-code-extensions/. The image will be too big. Then uncomment it. The image will fit.
+ * This makes sure images aren't wider than the URL bar while preserving their aspect ratio.
  */
 img {
   display: block;
@@ -49,8 +44,6 @@ img {
   padding-top: 20px;
 }
 
-/* Using all Material UI components would have been nice, but I didn't feel like a SnackBar fit very well here.
-I wanted something that persists and is near the URL bar so that the user sees it if they get an error. */
 #error_message {
   color: white;
   background-color: #FFA500;
