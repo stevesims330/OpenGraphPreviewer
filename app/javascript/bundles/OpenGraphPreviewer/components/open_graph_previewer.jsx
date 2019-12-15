@@ -9,6 +9,8 @@ import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles'
 
+import { theme } from './theme'
+
 export default class OpenGraphPreviewer extends React.Component {
   constructor(props) {
     super(props)
@@ -19,26 +21,7 @@ export default class OpenGraphPreviewer extends React.Component {
     }
     this.typingTimeout = null
     this.fetchingTimeout = null
-    /*
-      Since creating themes can be expensive, I moved the theme from the render method. I didn't notice any performance
-      issues before I moved it but putting it here from the beginning would prevent performance issues in the future.
-
-      From https://material-ui.com/customization/theming/:
-        "If you provide a new theme at each render, a new CSS object will be computed and injected. Both for UI
-        consistency and performance, it's better to render a limited number of theme objects."
-
-      In a larger app, I'd want to define the theme somewhere that would let me share it between components.
-    */
-    this.theme = createMuiTheme({
-      palette: {
-        primary: {
-          main: '#6d31ff',
-        },
-        secondary: {
-          main: '#53efce',
-        },
-      },
-    })
+    this.theme = createMuiTheme(theme)
   }
 
   fetchImage = (event) => {
@@ -46,23 +29,16 @@ export default class OpenGraphPreviewer extends React.Component {
     if (this.typingTimeout) {
       clearTimeout(this.typingTimeout)
     }
-    /*
-      Clearing the fetchingTimeout makes sure currently pending requests don't complete, for example, if the user holds down backspace while
-      a request is loading. Before I added this, the user could delete the URL and the image would load anyway.
-
-      Another option would have been to grey out the TextField, but that would have led to a poor user experience: Users
-      would either make a lot of accidental fetches and have to wait a long time before they could correct their fetch, or I'd have to increase
-      the halfSecondTimeoutInMs substantially. This would be less bad, but it would make the app feel less slick.
-    */
+    // Prevent currently pending requests from loading
     if (this.fetchingTimeout) {
       clearTimeout(this.fetchingTimeout)
     }
     this.setState({imageUrl: null, errorMessage: null, loading: false})
 
-    const halfSecondTimeoutInMs = 500
+    const halfSecondDelayInMs = 500
     this.typingTimeout = setTimeout(() => {
 
-      // I originally validated URL's outside the typingTimeout, but that spammed me with invalid URL error messages while I was typing.
+      // Validate URLs after user is done typing
       const invalidUrl = !validator.isURL(url)
       if (invalidUrl) {
         let errorMessage = "Please enter a URL in the following format: https://www.example.com"
@@ -74,33 +50,24 @@ export default class OpenGraphPreviewer extends React.Component {
       }
 
       this.setState({imageUrl: null, errorMessage: null, loading: true})
-      axios.get(`/api/v1/image_parser/begin_fetch?url=${url}`)
-        .then((result) => {
-          const requestId = result.data
-          // Unfortunately, since I'm already inside a timeout, "this" needs to be passed down despite using arrow functions throughout.
-          this.completeFetch(this, requestId)
+
+      self = this
+      this.buildHttpClient().get(`/api/v1/image_parser/begin_fetch?website_url=${url}`)
+        .then(() => {
+          // Pass down "this" since we it's inside a nested arrow function
+          this.completeFetch(this, url)
         }).catch(function (error) {
-          this.setState({
+          self.setState({
             imageUrl: null,
             errorMessage: `Error ${error.response.status}: OpenGraphPreviewer is currently unavailable. We will be back soon!`,
             loading: false
           })
         })
-    }, halfSecondTimeoutInMs)
+    }, halfSecondDelayInMs)
   }
 
-  /*
-    Poll the backend up to four times to see if the job has completed. The first request will fire after 1 second no matter what.
-    The subsequent ones will back off exponentially:
-      The second will fire 2 seconds after the first receives an error.
-      The third will fire 4 seconds after the second receives an error.
-      The fourth will fire 8 seconds after the second receives an error.
-    I chose an exponential back off so that a lot of clients don't overload the server, as they could if I were polling, say, every second.
-
-    How many attempts, and the rate of the back off, would definitely be something to be tweaked as the app scales. I became frustrated when
-    I got to the fourth wait.
-  */
-  completeFetch = (self, requestId, attempts = 0) => {
+  // Exponential back off retries for 4 times (retry in 2s, 4s, 8s)
+  completeFetch = (self, url, attempts = 0) => {
     if (self.fetchingTimeout) {
         clearTimeout(self.fetchingTimeout)
     }
@@ -113,17 +80,31 @@ export default class OpenGraphPreviewer extends React.Component {
       return
     }
 
-    const timeoutInMs = Math.pow(2, attempts) * 1000
+    const delayInMs = Math.pow(2, attempts) * 1000
 
     self.fetchingTimeout = setTimeout(() => {
-      axios.get(`/api/v1/image_parser/get_fetched_url?request_id=${requestId}`)
+      this.buildHttpClient().get(`/api/v1/image_parser/retrieve_image_url?website_url=${url}`)
       .then((result) => {
         this.setState({ imageUrl: result.data.url, errorMessage: result.data.error, loading: false })
         return
       }).catch(function (error) {
-        self.completeFetch(self, requestId, attempts + 1, error)
+        self.completeFetch(self, url, attempts + 1, error)
       })
-    }, timeoutInMs)
+    }, delayInMs)
+  }
+
+  preventPageRefresh = (event) => {
+    const pressedEnterKey = event.which === 13
+    if (pressedEnterKey) {
+      event.preventDefault()
+    }
+  }
+
+  buildHttpClient = () => {
+    const httpClient = axios.create()
+    const tenSecondsInMs = 10000
+    httpClient.defaults.timeout = tenSecondsInMs
+    return httpClient
   }
 
   render() {
@@ -135,7 +116,7 @@ export default class OpenGraphPreviewer extends React.Component {
             <Paper id="open_graph_paper">
               <div>
                 <form>
-                  <TextField fullWidth color="primary" label="Enter URL" variant="outlined" onChange={this.fetchImage}/>
+                  <TextField fullWidth color="primary" label="Enter URL" variant="outlined" onChange={this.fetchImage} onKeyPress={this.preventPageRefresh}/>
                 </form>
               </div>
               {loading &&

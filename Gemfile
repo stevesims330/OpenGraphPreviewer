@@ -4,10 +4,10 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.6.5'
 
 gem 'http', '4.2.0'
-gem 'ogp', '0.3.0'
 gem 'mini_racer', platforms: :ruby # required by react_on_rails
+gem 'ogp', '0.3.0'
 gem 'react_on_rails', '11.3.0'
-gem 'rspec-rails', '3.9'
+gem 'rubocop', '0.77.0'
 gem 'sidekiq', '6.0.3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -28,6 +28,11 @@ gem 'redis', '~> 4.0'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
+
+group :development, :test do
+  gem 'rspec-rails', '3.9'
+  gem "simplecov", require: false
+end
 
 group :development do
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
