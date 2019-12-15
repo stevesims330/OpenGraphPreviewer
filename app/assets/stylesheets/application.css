@@ -1,15 +1,63 @@
 /*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
- * vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
+ * I thought about using a styles.jsx file, but I started the frontend on the weekend and the assignment explicitly requires
+ * the usage of a CSS file. Also, if this were a larger app, this would let me share styling with non-React components.
  *
  *= require_tree .
  *= require_self
  */
+
+html {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+body {
+  background-color: #F4F4F4;
+}
+
+#open_graph_previewer {
+  margin-top: 5%;
+  width: 100%;
+}
+
+.centered {
+  width: 50%;
+  margin: 0 auto;
+}
+
+#open_graph_paper {
+  padding: 25px;
+}
+
+/*
+ * This makes sure images aren't wider than the URL bar while preserving their aspect ratio. You can test this by
+ * running bin/webpack --watch --colors --progress, commenting this out, reloading the page, and visiting
+ * https://revelry.co/vs-code-extensions/. The image will be too big. Then uncomment it. The image will fit.
+ */
+img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+#linear_progress_wrapper {
+  padding: 10px 0px;
+}
+
+#image_wrapper {
+  padding-top: 20px;
+}
+
+/* Using all Material UI components would have been nice, but I didn't feel like a SnackBar fit very well here.
+I wanted something that persists and is near the URL bar so that the user sees it if they get an error. */
+#error_message {
+  color: white;
+  background-color: #FFA500;
+  border-color: #FFA500;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 10px;
+  margin-top: 10px;
+}
