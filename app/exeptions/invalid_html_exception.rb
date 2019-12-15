@@ -1,2 +1,2 @@
-class InvalidHtmlException < OGP::MalformedSourceError
+class InvalidHtmlException < StandardError
 end

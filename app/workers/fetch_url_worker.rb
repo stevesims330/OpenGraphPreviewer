@@ -3,12 +3,13 @@ class FetchUrlWorker
 
   def perform(request_id, document_url)
     result = { url: nil, error: nil }
-    # TODO(stevesims330): https//ogp.me/, https://ogp.me/, https://www.ogp.me/, and https://www.ogp.me/ should all return the same result
     begin
-      response = Faraday.get(document_url)
-      result[:url] = ImageParsingService.new(response.body).url
-    rescue Faraday::ConnectionFailed
-      # I wrote cheerful error messages on purpose: https://uxplanet.org/how-to-write-good-error-messages-858e4551cd4
+      response_body = HttpService.new(document_url).get
+      result[:url] = ImageParsingService.new(response_body).url
+    rescue InvalidUrlException
+      # I wrote friendly error messages on purpose: https://uxplanet.org/how-to-write-good-error-messages-858e4551cd4
+      result[:error] = "Please enter the URL in the following format: https://www.example.com"
+    rescue FailedConnectionException
       result[:error] = "Sorry, #{document_url} is currently unavailable. Please try again later."
     end
 

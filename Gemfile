@@ -3,12 +3,12 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.4'
 
-gem 'faraday', '~> 0.17.1'
-gem 'ogp', '~> 0.3.0'
+gem 'http', '4.2.0'
+gem 'ogp', '0.3.0'
 gem 'mini_racer', platforms: :ruby # required by react_on_rails
 gem 'react_on_rails', '11.3.0'
-gem 'rspec-rails', '~> 3.9'
-gem 'sidekiq', '~> 6.0.3'
+gem 'rspec-rails', '3.9'
+gem 'sidekiq', '6.0.3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.4'
