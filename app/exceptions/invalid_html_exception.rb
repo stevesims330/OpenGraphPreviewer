@@ -1,0 +1,2 @@
+class InvalidHtmlException < StandardError
+end

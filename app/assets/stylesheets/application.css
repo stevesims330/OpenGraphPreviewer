@@ -1,0 +1,56 @@
+/*
+ *= require_tree .
+ *= require_self
+ */
+
+html {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+body {
+  background-color: #F4F4F4;
+}
+
+#open_graph_previewer {
+  margin-top: 5%;
+  width: 100%;
+}
+
+.centered {
+  width: 50%;
+  margin: 0 auto;
+}
+
+#open_graph_paper {
+  padding: 25px;
+}
+
+/*
+ * This makes sure images aren't wider than the URL bar while preserving their aspect ratio.
+ */
+img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+#linear_progress_wrapper {
+  padding: 10px 0px;
+}
+
+#image_wrapper {
+  padding-top: 20px;
+}
+
+#error_message {
+  color: white;
+  background-color: #FFA500;
+  border-color: #FFA500;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 10px;
+  margin-top: 10px;
+}
