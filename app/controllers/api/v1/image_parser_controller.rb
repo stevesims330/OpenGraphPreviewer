@@ -10,6 +10,7 @@ class Api::V1::ImageParserController < ApplicationController
   # Retrieves a website URL's Open Graph image URL from Redis.
   def retrieve_image_url
     result = Redis.new.get(params["website_url"])
+    api_key = ApiKey(key: params["api_key"]) # integer id, UUID key that corresponds to the api_key sent by clients
 
     if result
       render status: :ok, json: result
@@ -18,4 +19,17 @@ class Api::V1::ImageParserController < ApplicationController
       render status: :not_found, json: result.to_json
     end
   end
+
+  def fetch
+    result = Redis.new.get(params["website_url"])
+    # check Redis to see if the job is still processing, if it is, tell the user to check back in X seconds in the header
+    # if the job has completed with an image, return the URL
+
+  end
+
+  # long request
+  # polling
+  # callback URL
+  # WebSocket-like service
+
 end
